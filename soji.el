@@ -33,7 +33,7 @@
   :group 'extensions)
 
 (defcustom soji-file "~/Dropbox/Notes/soji_note/soji.org"
-  "File where soji stores notes"
+  "File where soji stores notes."
   :type 'file
   :set (lambda (varname val)
          (set-default varname
@@ -42,30 +42,29 @@
   :group 'soji-settings)
 
 (defcustom soji-work-tag "StitchFix"
-  "How to tag work day soji files. Usually your company name is best"
+  "How to tag work day soji files. Usually your company name is best."
   :type 'string
   :require 'soji
   :group 'soji-settings)
 
-(defcustom soji-dim-percentage 70 "How transparent to make the screen during a break"
+(defcustom soji-dim-percentage 70 "How transparent to make the screen during a break."
   :type 'number
   :require 'soji
   :group 'soji-settings)
 
-(defcustom soji-bright-percentage 100 "How transparent to make the screen during normal work"
+(defcustom soji-bright-percentage 100 "How transparent to make the screen during normal work."
   :type 'number
   :require 'soji
   :group 'soji-settings)
 
 (defcustom soji-pomodoro-length 25
-  "Length of Pomodoros"
+  "Length of Pomodoros."
   :type 'number
   :require 'soji
   :group 'soji-settings)
 
 (defcustom soji-break-length 5
-  "Length of Breaks
-" :type 'number
+  "Length of Breaks." :type 'number
 :require 'soji
 :group 'soji-settings)
 
@@ -78,12 +77,14 @@
   :lighter " Soji")
 
 (defun soji-break (min)
+  "Begin a break of length MIN."
   (interactive "nMinutes: ")
   (let ((org-pomodoro-short-break-length min))
     (soji-open)
     (org-pomodoro-start :short-break)))
 
 (defun soji-open ()
+  "Jump to the Soji home screen."
   (interactive)
   (let ((starting-buffer (current-buffer)))
     (if (org-clock-is-active)
@@ -101,6 +102,7 @@
       )))
 
 (defun soji-work (length)
+  "Begin a pomodoro of LENGTH."
   (interactive "P")
   (let ((org-pomodoro-length (or length soji-pomodoro-length)))
     (org-pomodoro))
@@ -112,6 +114,7 @@
   (switch-to-buffer (get-buffer-create "*scratch*")))
 
 (defun soji-agenda-work (length)
+  "Begin a pomodoro of LENGTH."
   (interactive "P")
   (org-agenda-switch-to)
   (soji-work length))
@@ -135,23 +138,27 @@
       subtree-end)))
 
 (defun soji-dim ()
+  "Dim Emacs or make it partially transparent."
   (interactive)
   (set-frame-parameter (selected-frame)
                        'alpha
                        soji-dim-percentage))
 
 (defun soji-end ()
+  "End a pomodoro."
   (interactive)
   (soji-dim)
   (soji-open))
 
 (defun soji-bright ()
+  "Brighten Emacs or make it opaque."
   (interactive)
   (set-frame-parameter (selected-frame)
                        'alpha
                        soji-bright-percentage))
 
 (defun soji-org-agenda-mark-habits ()
+  "Mark org-habit style TODOs."
   (when (not (get-text-property (point)
                                 'org-series))
     (let ((cursor (point)) item
