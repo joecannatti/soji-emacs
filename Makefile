@@ -10,6 +10,7 @@ unit:
 	${CASK} exec ert-runner
 
 compile: clean
+	${CASK} install
 	${CASK} build
 	${CASK} package
 

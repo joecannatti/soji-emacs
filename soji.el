@@ -1,5 +1,6 @@
-;;; soji.el --- Mindful Workday Tool
+;; soji.el --- Mindful Workday Tool
 
+;; Package-Requires: ((emacs "24.5"))
 ;; Copyright (C) 2017 Joe Cannatti
 ;;; License:
 
@@ -21,7 +22,9 @@
 ;;; Commentary:
 ;;; Code:
 ;;; SOJI
-(require 'cl)
+
+(eval-when-compile
+  (require 'cl))
 (require 'org)
 (require 'org-habit)
 (require 'org-pomodoro)
@@ -74,13 +77,13 @@
   :group 'soji-settings
   :lighter " Soji")
 
-(defun jc/soji-break (min)
+(defun soji-break (min)
   (interactive "nMinutes: ")
   (let ((org-pomodoro-short-break-length min))
-    (jc/soji-open)
+    (soji-open)
     (org-pomodoro-start :short-break)))
 
-(defun jc/soji-open ()
+(defun soji-open ()
   (interactive)
   (let ((starting-buffer (current-buffer)))
     (if (org-clock-is-active)
@@ -94,26 +97,26 @@
     (if (org-clock-is-active)
         (switch-to-buffer starting-buffer)
       (org-agenda nil "n")
-        ;;;(spacemacs/toggle-current-window-dedication)
+      ;;;(set-window-dedicated-p (selected-window) t)
       )))
 
-(defun jc/soji-work (length)
+(defun soji-work (length)
   (interactive "P")
   (let ((org-pomodoro-length (or length soji-pomodoro-length)))
     (org-pomodoro))
   (org-narrow-to-subtree)
   (delete-other-windows)
-  (spacemacs/toggle-current-window-dedication)
+  (set-window-dedicated-p (selected-window) t)
   (split-window-horizontally)
   (other-window 1)
-  (spacemacs/switch-to-scratch-buffer))
+  (switch-to-buffer (get-buffer-create "*scratch*")))
 
-(defun jc/soji-agenda-work (length)
+(defun soji-agenda-work (length)
   (interactive "P")
   (org-agenda-switch-to)
-  (jc/soji-work length))
+  (soji-work length))
 
-(defun jc/org-skip-subtree-if-habit ()
+(defun soji-skip-subtree-if-habit ()
   "Skip an agenda entry if it has a STYLE property equal to \"habit\"."
   (let ((subtree-end (save-excursion
                        (org-end-of-subtree t))))
@@ -122,7 +125,7 @@
         subtree-end
       nil)))
 
-(defun jc/org-skip-subtree-if-not-habit ()
+(defun soji-skip-subtree-if-not-habit ()
   "Skip an agenda entry if it has a STYLE property equal to \"habit\"."
   (let ((subtree-end (save-excursion
                        (org-end-of-subtree t))))
@@ -131,29 +134,26 @@
         nil
       subtree-end)))
 
-(defun jc/soji-dim ()
+(defun soji-dim ()
   (interactive)
   (set-frame-parameter (selected-frame)
                        'alpha
                        soji-dim-percentage))
 
-(defun jc/soji-end ()
+(defun soji-end ()
   (interactive)
-  (jc/soji-dim)
-  (jc/soji-open))
+  (soji-dim)
+  (soji-open))
 
-(defun jc/soji-bright ()
+(defun soji-bright ()
   (interactive)
   (set-frame-parameter (selected-frame)
                        'alpha
                        soji-bright-percentage))
 
-(defvar my/org-habit-show-graphs-everywhere t)
-
-(defun my/org-agenda-mark-habits ()
-  (when (and my/org-habit-show-graphs-everywhere
-             (not (get-text-property (point)
-                                     'org-series)))
+(defun soji-org-agenda-mark-habits ()
+  (when (not (get-text-property (point)
+                                'org-series))
     (let ((cursor (point)) item
           data)
       (while (setq cursor (next-single-property-change cursor 'org-marker))
@@ -167,10 +167,10 @@
                              'org-habit-p
                              data))))))
 
-(advice-add #'org-agenda-finalize :before #'my/org-agenda-mark-habits)
-(add-hook 'org-pomodoro-started-hook 'jc/soji-bright)
-(add-hook 'org-pomodoro-finished-hook 'jc/soji-end)
-(add-hook 'org-pomodoro-killed-hook 'jc/soji-dim)
-(add-hook 'org-pomodoro-break-finished-hook 'jc/soji-open)
+(advice-add #'org-agenda-finalize :before #'soji-org-agenda-mark-habits)
+(add-hook 'org-pomodoro-started-hook 'soji-bright)
+(add-hook 'org-pomodoro-finished-hook 'soji-end)
+(add-hook 'org-pomodoro-killed-hook 'soji-dim)
+(add-hook 'org-pomodoro-break-finished-hook 'soji-open)
 (provide 'soji)
 ;;; soji.el ends here

@@ -4,6 +4,7 @@
 (package "soji" "0.0.1" "Mindful Workday Tool")
 (depends-on "cl")
 (depends-on "org")
+(depends-on "org-pomodoro")
 
 (development
  (depends-on "f")
