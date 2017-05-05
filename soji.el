@@ -41,6 +41,15 @@
   :require 'soji
   :group 'soji-settings)
 
+(defcustom reading-file "~/Dropbox/Notes/soji_note/reading.org"
+  "File where soji stores reading data."
+  :type 'file
+  :set (lambda (varname val)
+         (set-default varname
+                      (expand-file-name val)))
+  :require 'soji
+  :group 'soji-settings)
+
 (defcustom soji-work-tag "StitchFix"
   "How to tag work day soji files. Usually your company name is best."
   :type 'string
@@ -179,5 +188,108 @@
 (add-hook 'org-pomodoro-finished-hook 'soji-end)
 (add-hook 'org-pomodoro-killed-hook 'soji-dim)
 (add-hook 'org-pomodoro-break-finished-hook 'soji-open)
+
+(add-to-list 'org-agenda-custom-commands
+  (quote
+   ("n" "Agenda and all TODOs"
+    ((agenda ""
+             ((org-agenda-overriding-header "Today")
+              (org-agenda-span 1)
+              (org-agenda-skip-function
+               (quote
+                (org-skip-subtree-if-habit)))
+              (org-agenda-sorting-strategy
+               (quote
+                (todo-state-down time-up)))))
+     (tags-todo "+STYLE=\"habit\""
+                ((org-agenda-overriding-header "Habits")
+                 (org-agenda-sorting-strategy
+                  (quote
+                   (timestamp-up)))))
+     (alltodo ""
+              ((org-agenda-overriding-header "Backlog")
+               (org-agenda-skip-function
+                (quote
+                 (org-agenda-skip-entry-if
+                  (quote timestamp))))
+               (org-agenda-sorting-strategy
+                (quote
+                 (tag-up priority-up time-up)))
+               (org-agenda-view-columns-initially t)))
+     (alltodo ""
+              ((org-agenda-overriding-header "Scheduled TODOs")
+               (org-agenda-skip-function
+                (quote
+                 (org-agenda-skip-entry-if
+                  (quote nottimestamp)
+                  (quote regexp)
+                  "habit"))))))
+    nil
+    ("current-agenda.txt" "current-agenda.html"))))
+
+(add-to-list 'org-capture-templates
+             (quote
+              ("n" "Note" entry
+               (file+datetree journal-file)
+               "* note -- %?
+ %i" :clock-in t :clock-resume t)))
+
+(add-to-list 'org-capture-templates
+             (quote
+              ("l" "Planning" entry
+               (file+headline soji-file "Planning")
+               "* %u -- planning -- %?
+ %i  " :clock-in t :clock-resume t)))
+(add-to-list 'org-capture-templates
+             (quote
+              ("c" "Slack" entry
+               (file+headline soji-file "Communications")
+               "* %u -- slack chat --  %?
+ %i" :clock-in t :clock-resume t)))
+(add-to-list 'org-capture-templates
+             (quote
+              ("r" "Reading" entry
+               (file+headline reading-file "To Read")
+               "* TODO Read -- %?
+ %i  " :clock-in t :clock-resume t)))
+(add-to-list 'org-capture-templates
+             (quote
+              ("e" "Emails" entry
+               (file+headline soji-file "Communications")
+               "* %u -- emails -- %?
+ %i" :clock-in t :clock-resume t)))
+(add-to-list 'org-capture-templates
+             (quote
+              ("m" "Meeting" entry
+               (file+headline soji-file "Meetings")
+               "* %u -- meeting -- %?
+ %i" :jump-to-captured t :clock-in t)))
+(add-to-list 'org-capture-templates
+             (quote
+              ("g" "PR Review" entry
+               (file+datetree soji-file)
+               "* TODO %?
+ %i
+" :clock-in t :clock-resume t)))
+(add-to-list 'org-capture-templates
+             (quote
+              ("s" "Stitch Fix Todo" entry
+               (file+headline soji-file "Stitch Fix Tasks")
+               "* TODO %?
+ %i")))
+(add-to-list 'org-capture-templates
+             (quote
+              ("t" "Todo" entry
+               (file+headline soji-file "Tasks")
+               "* TODO %?
+ %i
+")))
+(add-to-list 'org-capture-templates
+             (quote
+              ("j" "Journal" entry
+               (file+datetree soji-file)
+               "* journal
+ %i %?
+" :clock-in t :clock-resume t)))
 (provide 'soji)
 ;;; soji.el ends here
