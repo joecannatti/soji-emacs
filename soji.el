@@ -27,6 +27,7 @@
   (require 'cl))
 (require 'org)
 (require 'org-habit)
+(require 'org-capture)
 (require 'org-pomodoro)
 
 (defgroup soji-settings nil "Tweakable stuff for the Soji Mindful Workday Tool"
