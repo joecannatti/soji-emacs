@@ -56,6 +56,12 @@
   :require 'soji
   :group 'soji-settings)
 
+(defcustom soji-work-name "Stitch Fix"
+  "How to present the name of your work in human readable form."
+  :type 'string
+  :require 'soji
+  :group 'soji-settings)
+
 (defcustom soji-dim-percentage 70 "How transparent to make the screen during a break."
   :type 'number
   :require 'soji
@@ -274,7 +280,7 @@
 (add-to-list 'org-capture-templates
              (quote
               ("s" "Stitch Fix Todo" entry
-               (file+headline soji-file "Stitch Fix Tasks")
+               (file+headline soji-file (concat soji-work-name " Tasks"))
                "* TODO %?
  %i")))
 (add-to-list 'org-capture-templates
